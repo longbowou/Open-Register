@@ -2,17 +2,15 @@ import {DynamoDBClient, GetItemCommand, PutItemCommand} from "@aws-sdk/client-dy
 import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import {v4 as uuidv4} from 'uuid';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
-const saltRounds = 10;
+const region = 'us-east-2'
 
-const dynamoDbClient = new DynamoDBClient({region: 'us-east-2'});
-const s3Client = new S3Client({region: 'us-east-2'});
+const dynamoDbClient = new DynamoDBClient({region});
+const s3Client = new S3Client({region});
 
 const S3_BUCKET_NAME = 'project-open-media';
 const DYNAMO_TABLE_NAME = 'ProjectOpen';
-const JWT_SECRET = process.env.JWT_SECRET;
 
 export const handler = async (event) => {
     try {
@@ -69,14 +67,6 @@ export const handler = async (event) => {
         const createdOn = new Date().toISOString()
         const imageUrl = `https://${S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`
 
-        let hashPassword = null;
-        bcrypt.hash(myPlaintextPassword, saltRounds, function (err, hash) {
-            if (err) {
-                console.log(err);
-            }
-            hashPassword = hash;
-        });
-
         const putParams = {
             TableName: DYNAMO_TABLE_NAME,
             Item: {
@@ -85,18 +75,12 @@ export const handler = async (event) => {
                 email: {S: email},
                 address: {S: address},
                 imageUrl: {S: imageUrl},
-                password: {S: hashPassword},
+                password: {S: bcrypt.hashSync(password, 10)},
                 createdOn: {S: createdOn},
             },
         };
 
         await dynamoDbClient.send(new PutItemCommand(putParams));
-
-        const authToken = jwt.sign(
-            {id, email},
-            JWT_SECRET,
-            {expiresIn: '24h'}
-        );
 
         const user = {
             id,
@@ -115,9 +99,9 @@ export const handler = async (event) => {
                 'Access-Control-Allow-Headers': 'Content-Type',
             },
             body: JSON.stringify({
+                errors: [],
                 user,
                 uploadURL,
-                authToken,
             }),
         };
     } catch (error) {
@@ -128,4 +112,3 @@ export const handler = async (event) => {
         };
     }
 };
-

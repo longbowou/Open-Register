@@ -3,4 +3,4 @@ services:
     build: .
     volumes:
       - ./:/app
-    restart: "no"
+    command: pnpm run main
