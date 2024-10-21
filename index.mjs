@@ -1,4 +1,4 @@
-import {DynamoDBClient, GetItemCommand, PutItemCommand} from "@aws-sdk/client-dynamodb";
+import {DynamoDBClient, PutItemCommand, ScanCommand} from "@aws-sdk/client-dynamodb";
 import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import {v4 as uuidv4} from 'uuid';
@@ -45,13 +45,17 @@ export const handler = async (event) => {
 
         const uploadURL = await getSignedUrl(s3Client, command, {expiresIn: 60});
 
-        const getParams = {
+        const scanParams = {
             TableName: DYNAMO_TABLE_NAME,
-            Key: {email: {S: email}},
+            FilterExpression: 'email = :email',
+            ExpressionAttributeValues: {
+                ':email': {S: email}
+            }
         };
 
-        const existingUser = await dynamoDbClient.send(new GetItemCommand(getParams));
-        if (existingUser.Item) {
+        const data = await dynamoDbClient.send(new ScanCommand(scanParams));
+        console.log(data)
+        if (data.Count > 0) {
             return {
                 statusCode: 200,
                 headers: {
