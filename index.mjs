@@ -19,12 +19,11 @@ export const handler = async (event) => {
             email,
             address,
             password,
-            passwordConfirmation,
             fileName,
             contentType
         } = JSON.parse(event.body);
 
-        if (!name || !email || !address || !fileName || !contentType || !password || !passwordConfirmation) {
+        if (!name || !email || !address || !fileName || !contentType || !password) {
             return {
                 statusCode: 400,
                 headers: {
@@ -42,8 +41,8 @@ export const handler = async (event) => {
             ContentType: contentType,
         };
         const command = new PutObjectCommand(uploadParams);
-
         const uploadURL = await getSignedUrl(s3Client, command, {expiresIn: 60});
+        const imageUrl = `https://${S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`
 
         const scanParams = {
             TableName: DYNAMO_TABLE_NAME,
@@ -69,7 +68,6 @@ export const handler = async (event) => {
 
         const id = uuidv4();
         const createdOn = new Date().toISOString()
-        const imageUrl = `https://${S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`
 
         const putParams = {
             TableName: DYNAMO_TABLE_NAME,
