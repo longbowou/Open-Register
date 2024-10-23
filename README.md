@@ -4,6 +4,8 @@ This Lambda function enables secure user registration by integrating DynamoDB fo
 handling profile image uploads. It ensures that all user data, including passwords, is stored securely, while providing
 an efficient way to manage profile pictures. Here's a breakdown of its core features:
 
+![Screenshot 2024-10-22 at 10.04.17 PM.png](screenshots/apigateway/Screenshot%202024-10-22%20at%2010.04.17%E2%80%AFPM.png)
+
 ## Key Highlights
 
 - **User Registration with DynamoDB**:
@@ -47,6 +49,18 @@ This Lambda function delivers a robust and secure registration process that inte
 S3 and DynamoDB. By offering secure password handling, unique email validation, and efficient image uploads, it provides
 the foundation for a modern, user-friendly, and scalable registration system. Perfect for applications looking to
 balance performance with top-tier security.
+
+### What's next ?
+
+Check the [main](https://github.com/longbowou/open-frontend) repository this one is part of.
+
+## Screenshot
+
+![Screenshot 2024-10-22 at 9.48.34 PM.png](screenshots/lambda/Screenshot%202024-10-22%20at%209.48.34%E2%80%AFPM.png)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 
 
 
