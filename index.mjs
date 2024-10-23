@@ -4,13 +4,13 @@ import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
 
-const region = 'us-east-2'
+const region = process.env.AWS_REGION;
 
 const dynamoDbClient = new DynamoDBClient({region});
 const s3Client = new S3Client({region});
 
-const S3_BUCKET_NAME = 'project-open-media';
-const DYNAMO_TABLE_NAME = 'ProjectOpen';
+const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
+const DYNAMO_TABLE_NAME = process.env.DYNAMO_TABLE_NAME;
 
 export const handler = async (event) => {
     try {
